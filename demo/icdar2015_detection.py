@@ -44,21 +44,21 @@ def get_parser():
 
     parser.add_argument(
         "--weights",
-        default="./out_dir_r101/icdar2015_model/model_ic15_r101.pth",
+        default="/workspace/data/model/textfuse_ic15_r101.pth",
         metavar="pth",
         help="the model used to inference",
     )
 
     parser.add_argument(
         "--input",
-        default="./input_images/*.jpg",
+        default="/workspace/data/test_image1/*.jpg",
         nargs="+",
         help="the folder of icdar2015 test images"
     )
 
     parser.add_argument(
         "--output",
-        default="./test_icdar2015/",
+        default="/workspace/data/result/test_icdar2015/",
         help="A file or directory to save output visualizations. "
         "If not given, will show output in an OpenCV window.",
     )
@@ -82,10 +82,10 @@ def compute_polygon_area(points):
     s = 0
     point_num = len(points)
     if(point_num < 3): return 0.0
-    for i in range(point_num): 
+    for i in range(point_num):
         s += points[i][1] * (points[i-1][0] - points[(i+1)%point_num][0])
     return abs(s/2.0)
-    
+
 
 def save_result_to_txt(txt_save_path,prediction,polygons):
 
@@ -117,6 +117,10 @@ if __name__ == "__main__":
     args = get_parser().parse_args()
 
     cfg = setup_cfg(args)
+    cfg.defrost()
+    cfg.MODEL.DEVICE = 'cpu'
+    cfg.freeze()
+
     detection_demo = VisualizationDemo(cfg)
 
     test_images_path = args.input
